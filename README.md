@@ -6,9 +6,15 @@ The report was prepared based on stock data from Yahoo finance. Yahoo Finance is
 
 [Automatyzacja procesów analitycznych w SAS](https://github.com/Szymon-Czuszek/SAS-Automation/blob/main/Project/Projekt%20-%20Automatyzacja%20procesów%20analitycznych%20w%20SAS%20-%20Szymon%20Czuszek.pdf): Project Second Version
 
-## Using SAS 4GL and Macros
+## Using SAS 4GL
 
 SAS 4GL is a high-level programming language developed specifically for users working in the SAS environment. Its purpose is to enable easy data processing and report generation, and to allow users to write programs with minimal need to manage technical details. 4GL differs from traditional programming languages, such as SAS Base, in that it focuses on providing simplicity of use and efficiency, eliminating the need to write complex code. It is mainly used for data manipulation, including aggregation, transformation and summary generation, making it a very useful tool for analyzing large data sets and automating repetitive tasks.
+
+## SAS Macro
+
+SAS Macro is a macro language in the SAS environment that allows automation and parameterization of code. By using macros, it is possible to generate dynamic programs that can be adapted to different data and conditions. Macros in SAS allow the creation of repeatable blocks of code that can be easily used in different parts of the program, saving time and reducing coding errors. The language is particularly useful for processing large data sets and for tasks that require the same operations to be used repeatedly, making it an essential tool in data analysis automation projects.
+
+Translated with DeepL.com (free version)
 
 ## Using SAS Flows
 
