@@ -26,7 +26,11 @@ SAS 4GL is a high-level programming language developed specifically for users wo
 
 ## SAS Macro
 
-SAS Macro is a macro language in the SAS environment that allows automation and parameterization of code. By using macros, it is possible to generate dynamic programs that can be adapted to different data and conditions. Macros in SAS allow the creation of repeatable blocks of code that can be easily used in different parts of the program, saving time and reducing coding errors. The language is particularly useful for processing large data sets and for tasks that require the same operations to be used repeatedly, making it an essential tool in data analysis automation projects.
+SAS Macro is a macro language in the SAS environment that allows automation and parameterization of code. By using macros, it is possible to generate dynamic programs that can be adapted to different data and conditions. Macros in SAS allow the creation of repeatable blocks of code that can be easily used in different parts of the program, saving time and reducing coding errors. The language is particularly useful for processing large data sets and for tasks that require the same operations to be used repeatedly, making it an essential tool in data analysis automation projects. It enables:
+- Dynamic program generation based on variable inputs
+- Code reuse and modularization
+- Reduction of repetitive coding tasks
+- Improved efficiency in processing large datasets
 
 ## Using SAS Flows
 
