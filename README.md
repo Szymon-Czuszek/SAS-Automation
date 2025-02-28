@@ -17,13 +17,13 @@ Yahoo Finance is a widely recognized platform that provides access to real-time 
 
 ## Key Technologies 🔧
 
-### Using SAS 4GL
+### SAS 4GL 🖥️
 
 SAS 4GL is a high-level programming language developed specifically for users working in the SAS environment. Its purpose is to enable easy data processing and report generation, and to allow users to write programs with minimal need to manage technical details. 4GL differs from traditional programming languages, such as SAS Base, in that it focuses on providing simplicity of use and efficiency, eliminating the need to write complex code. It is mainly used for data manipulation, including aggregation, transformation and summary generation, making it a very useful tool for analyzing large data sets and automating repetitive tasks. It simplifies data processing and report generation by abstracting technical complexities, allowing users to:
-- Perform data aggregation, transformation, and summarization
-- Automate repetitive data tasks
-- Reduce manual coding efforts
-- Enhance efficiency in data manipulation
+- 📊 Perform data aggregation, transformation, and summarization
+- 🔄 Automate repetitive data tasks
+- ✍️ Reduce manual coding efforts
+- ⚡ Enhance efficiency in data manipulation
 
 
 ### SAS Macro
