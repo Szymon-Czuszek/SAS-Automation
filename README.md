@@ -46,3 +46,8 @@ SAS Flow is a visual tool used to design and automate analysis processes in the 
 - 📊 Data Processing & Transformation: Leveraging SAS 4GL and Macros for efficient data handling.
 - 📈 Dynamic Reporting: Automated generation of insights and visualizations for financial analysis.
 - 🔄 Workflow Optimization: Use of SAS Flows to design structured, automated analytics processes.
+
+## Future Enhancements 🔮
+- 🔍 Expanding data sources beyond Yahoo Finance
+- 🤖 Incorporating machine learning models for predictive analytics
+- 🔄 Enhancing automation with additional SAS features and external integrations
