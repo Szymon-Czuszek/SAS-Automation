@@ -17,7 +17,7 @@ Yahoo Finance is a widely recognized platform that provides access to real-time 
 - 📙 [SAS Curiosity Cup 2025](https://github.com/Szymon-Czuszek/SAS-Automation/blob/main/Project/LoveForStonks.pdf): SAS Curiosity Cup 2025 Paper - Annonimised
 - 📕 [SAS Curiosity Cup 2025](https://github.com/Szymon-Czuszek/SAS-Automation/blob/main/Project/CzuszekCzuszekMedońZastawnyUniversityOfEconomicsInKatowiceLoveForStonks.pdf): SAS Curiosity Cup 2025 Paper
 
-## Key Technologies 🔧
+## 🔧 Key Technologies
 
 ### SAS 4GL 🖥️
 
