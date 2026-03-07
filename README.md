@@ -42,7 +42,7 @@ SAS Flow is a visual tool used to design and automate analysis processes in the 
 - 🔄 Seamless integration of data import, transformation, analysis, and visualization
 - 🤖 Enhanced accessibility for non-programmers to implement complex analytical tasks
 
-## Features & Benefits 🌟
+## 🌟 Features & Benefits
 - 🤖 Automated Data Retrieval: Integration with Yahoo Finance API to fetch real-time and historical stock data.
 - 📊 Data Processing & Transformation: Leveraging SAS 4GL and Macros for efficient data handling.
 - 📈 Dynamic Reporting: Automated generation of insights and visualizations for financial analysis.
