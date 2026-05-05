@@ -1,12 +1,23 @@
-data &_output1;
-    set &_input1;
-    retain prev_MainRecordID;  /* Retain previous value of MainRecordID */
-    
-    if missing(MainRecordID) then do;  
-        if _N_ = 1 then MainRecordID = 1;  /* Initialize first row with 1 */
-        else MainRecordID = prev_MainRecordID + 1;  /* Increment previous value */
-    end;
+DATA &_output1;
+    SET &_input1;
 
-    prev_MainRecordID = MainRecordID;  /* Update prev_MainRecordID for next row */
+    /* --- STEP 1: Retain previous MainRecordID value --- */
+    RETAIN prev_MainRecordID;
 
-run;
+    /* --- STEP 2: Fill missing MainRecordID values --- */
+    IF MISSING(MainRecordID) THEN DO;
+
+        /* Initialize first observation */
+        IF _N_ = 1 THEN 
+            MainRecordID = 1;
+
+        /* Otherwise increment based on previous value */
+        ELSE 
+            MainRecordID = prev_MainRecordID + 1;
+
+    END;
+
+    /* --- STEP 3: Store current value for next iteration --- */
+    prev_MainRecordID = MainRecordID;
+
+RUN;
