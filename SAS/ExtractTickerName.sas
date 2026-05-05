@@ -1,13 +1,15 @@
 DATA &_output1;
-	SET &_input1;
+    SET &_input1;
 
-	/* Remove special characters using COMPRESS */
-	NAME=COMPRESS(NAME, "(),' ");
+    /* --- STEP 1: Remove unwanted special characters --- */
+    /* Removes parentheses, commas, apostrophes, and spaces */
+    NAME = COMPRESS(NAME, "(),' ");
 
-	/* Remove the word 'close' (case insensitive) */
-	NAME=TRANWRD(NAME, 'close', '');
-	NAME=TRANWRD(NAME, 'CLOSE', '');
+    /* --- STEP 2: Remove the word 'close' (case-insensitive) --- */
+    /* TRANWRD is case-sensitive, so we handle all common variations */
 
-	/* For uppercase 'CLOSE' */
-	NAME=TRANWRD(NAME, 'Close', '');
+    NAME = TRANWRD(NAME, 'close', '');
+    NAME = TRANWRD(NAME, 'CLOSE', '');
+    NAME = TRANWRD(NAME, 'Close', '');
+
 RUN;
