@@ -1,29 +1,36 @@
-/* Creating new variables to calculate the absolute forecast error for both periods */
-
+/* --- STEP 1: Calculate Absolute Forecast Errors (AFE) --- */
 DATA &_output1;
-	SET &_input1;
+    SET &_input1;
 
-	/* Calculate the absolute forecast error before the revolution */
-	AFE_Before=ABS(ForecastBeforeRevolution - CloseAfter);
+    /* Absolute Forecast Error before the AI revolution */
+    AFE_Before = ABS(ForecastBeforeRevolution - CloseAfter);
 
-	/* Calculate the absolute forecast error after the revolution */
-	AFE_After=ABS(ForecastAfterRevolution - CloseAfter);
+    /* Absolute Forecast Error after the AI revolution */
+    AFE_After  = ABS(ForecastAfterRevolution - CloseAfter);
+
 RUN;
 
-/* Generate a boxplot comparing the absolute forecast errors before and after the AI revolution */
+
+/* --- STEP 2: Visualize comparison using boxplots --- */
 PROC SGPLOT DATA=&_output1;
-	/* Create a boxplot for absolute forecast error before the AI revolution, color it blue */
-	VBOX AFE_Before / CATEGORY=Ticker FILLATTRS=(COLOR=blue);
 
-	/* Create a boxplot for absolute forecast error after the AI revolution, color it yellow */
-	VBOX AFE_After / CATEGORY=Ticker FILLATTRS=(COLOR=yellow);
+    /* Boxplot: Before AI revolution */
+    VBOX AFE_Before / 
+        CATEGORY=Ticker 
+        FILLATTRS=(COLOR=blue)
+        NAME="before";
 
-	/* Label the x-axis as Company Ticker */
-	XAXIS LABEL="Company Ticker";
+    /* Boxplot: After AI revolution */
+    VBOX AFE_After / 
+        CATEGORY=Ticker 
+        FILLATTRS=(COLOR=yellow)
+        NAME="after";
 
-	/* Label the y-axis as Absolute Forecast Error (AFE) */
-	YAXIS LABEL="Absolute Forecast Error (AFE)";
+    /* Axis labels */
+    XAXIS LABEL="Company Ticker";
+    YAXIS LABEL="Absolute Forecast Error (AFE)";
 
-	/* Title the plot with a clear description of the analysis */
-	TITLE "Forecast Error Before vs. After AI Revolution";
+    /* Title */
+    TITLE "Forecast Error Before vs. After AI Revolution";
+
 RUN;
