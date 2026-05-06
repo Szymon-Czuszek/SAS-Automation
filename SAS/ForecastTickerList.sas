@@ -1,25 +1,28 @@
-/* Include the external SAS script that contains the ARMA forecasting macro */
+/* --- STEP 1: Include external SAS script with ARMA macro --- */
+/* This file should contain the %ARMA macro definition */
 %INCLUDE "/export/viya/homes/szymon.czuszek@edu.uekat.pl/casuser/Automatyzacja_procesow/SAS Curiosity Cup 2025/ForecastARMA.sas";
 
-/* Create an empty dataset to store all forecasted data */
+
+/* --- STEP 2: Initialize dataset to store all forecast results --- */
 DATA ALL_DATA;
-	LENGTH TICKER $10;
-
-	/* Define column 'TICKER' as a character variable with a maximum length of 10 */
+    LENGTH TICKER $10;  /* Ensure consistent length for ticker variable */
+    STOP;               /* Prevent creation of an empty observation */
 RUN;
 
-/* Iterate over each ticker in the ticker list and execute the ARMA macro */
+
+/* --- STEP 3: Loop through ticker list and execute ARMA macro --- */
 DATA _NULL_;
-	SET WORK.TickerList;
+    SET WORK.TickerList;
 
-	/* Read the list of tickers from the WORK library */
-	/* Dynamically generate and execute the ARMA macro call for each ticker */
-	CALL EXECUTE('%ARMA(' || NAME || ', &_input1, ' || NAME || ')');
+    /* Dynamically build and execute macro calls */
+    CALL EXECUTE(
+        '%ARMA(' || STRIP(NAME) || ', &_input1, ' || STRIP(NAME) || ')'
+    );
+
 RUN;
 
-/* Store the results of all ARMA forecasts in the final dataset */
-DATA &_output1;
-	SET ALL_DATA;
 
-	/* Append forecasted data to the output dataset */
+/* --- STEP 4: Save final combined results --- */
+DATA &_output1;
+    SET ALL_DATA;
 RUN;
