@@ -40,15 +40,17 @@ SAS Macro is a macro language in the SAS environment that allows automation and 
 SAS Flow is a visual tool used to design and automate analysis processes in the SAS environment. It allows users to create data analysis processes by creating workflows that define the various steps of analysis, such as importing data, processing it, analyzing it and presenting the results. SAS Flow is particularly useful in the context of projects that require automation of repetitive tasks or data processing. Through its use, processes can be designed graphically, making it easy for even those without advanced programming knowledge to build and manage complex analysis and business processes. It offers:
 - 🎨 A graphical interface for creating and organizing analytical processes
 - 🔄 Seamless integration of data import, transformation, analysis, and visualization
-- 🤖 Enhanced accessibility for non-programmers to implement complex analytical tasks
+- 🤖 Enhanced accessibility for non-programmers to implement complex analytical tasks without the need for high technical staff
 
 ## 🌟 Features & Benefits
+
 - 🤖 Automated Data Retrieval: Integration with Yahoo Finance API to fetch real-time and historical stock data.
 - 📊 Data Processing & Transformation: Leveraging SAS 4GL and Macros for efficient data handling.
 - 📈 Dynamic Reporting: Automated generation of insights and visualizations for financial analysis.
 - 🔄 Workflow Optimization: Use of SAS Flows to design structured, automated analytics processes.
 
 ## 🔮 Future Enhancements
+
 - 🔍 Expanding data sources beyond Yahoo Finance
 - 🤖 Incorporating machine learning models for predictive analytics
 - 🔄 Enhancing automation with additional SAS features and external integrations

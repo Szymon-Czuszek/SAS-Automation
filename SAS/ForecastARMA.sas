@@ -1,31 +1,34 @@
 %MACRO ARMA(TICKER, INPUT, OUTPUT);
-	/* Perform ARIMA modeling on the selected ticker's closing price */
-	PROC ARIMA DATA=&INPUT;
-		IDENTIFY VAR="('Close', '&TICKER')"N;
 
-		/* Identify the time series for the given ticker */
-		ESTIMATE P=1 Q=1;
+    /* --- STEP 1: ARIMA modeling for selected ticker --- */
+    PROC ARIMA DATA=&INPUT;
 
-		/* Estimate ARIMA model with (1,1) parameters */
-		FORECAST LEAD=800 OUT=&OUTPUT;
+        /* Identify the time series (dynamic column name) */
+        IDENTIFY VAR="('Close', '&TICKER')"N;
 
-		/* Generate a 30-day forecast */
-	RUN;
+        /* Estimate ARMA(1,1) model */
+        ESTIMATE P=1 Q=1;
 
-	/* Rename the forecasted column and add a Ticker column */
-	DATA &OUTPUT;
-		SET &OUTPUT;
-		RENAME "('Close', '&TICKER')"N=CLOSE;
+        /* Generate forecast (LEAD = number of periods ahead) */
+        FORECAST LEAD=800 OUT=&OUTPUT;
 
-		/* Rename dynamically created column to 'CLOSE' */
-		TICKER="&TICKER";
+    RUN;
 
-		/* Add the TICKER column for identification */
-	RUN;
+    /* --- STEP 2: Post-process forecast output --- */
+    DATA &OUTPUT;
+        SET &OUTPUT;
 
-	/* Append the new forecast data to the ALL_DATA dataset */
-	DATA ALL_DATA;
-		SET ALL_DATA &OUTPUT;
-	RUN;
+        /* Rename dynamically created column to a standard name */
+        RENAME "('Close', '&TICKER')"N = CLOSE;
+
+        /* Add ticker identifier */
+        TICKER = "&TICKER";
+
+    RUN;
+
+    /* --- STEP 3: Append results to master dataset --- */
+    DATA ALL_DATA;
+        SET ALL_DATA &OUTPUT;
+    RUN;
 
 %MEND ARMA;

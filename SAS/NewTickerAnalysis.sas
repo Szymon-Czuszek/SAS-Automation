@@ -1,204 +1,402 @@
+/*============================================================================*/
+/* STEP 1: Extract ticker and date parameters from the source dataset         */
+/*============================================================================*/
+
 DATA _NULL_;
-    set STOCKS.TICKER_LIST end=last;
-    if last then do;
-        call symputx('ticker', ticker);
-        call symputx('start_date', start_date);
-        call symputx('end_date', end_date);
-    end;
+    SET STOCKS.TICKER_LIST END=last;
+
+    /* Store values from the last observation as SAS macro variables */
+    IF last THEN DO;
+        CALL SYMPUTX('ticker', ticker);
+        CALL SYMPUTX('start_date', start_date);
+        CALL SYMPUTX('end_date', end_date);
+    END;
 RUN;
 
-/* Example of using the macro variables */
-%put &=ticker;
-%put &=start_date;
-%put &=end_date;
 
-%let root_path = /export/viya/homes/szymon.czuszek@edu.uekat.pl/casuser/Automatyzacja_procesow/dane_zrodlowe/yfinance;
+/*============================================================================*/
+/* STEP 2: Display extracted macro variable values in the SAS log             */
+/*============================================================================*/
 
-/* You can now use the extracted macro variables in your code or macros */
-%put Ticker: &ticker;
-%put Start Date: &start_date;
-%put End Date: &end_date;
+%PUT &=ticker;
+%PUT &=start_date;
+%PUT &=end_date;
 
 
-/* Define the destination library pointing to the folder */
+/*============================================================================*/
+/* STEP 3: Define root directory for storing stock data                       */
+/*============================================================================*/
+
+%LET root_path=
+/export/viya/homes/szymon.czuszek@edu.uekat.pl/casuser/
+Automatyzacja_procesow/dane_zrodlowe/yfinance;
+
+/* Display macro variable values */
+%PUT Ticker: &ticker;
+%PUT Start Date: &start_date;
+%PUT End Date: &end_date;
+
+
+/*============================================================================*/
+/* STEP 4: Define SAS library pointing to the root folder                     */
+/*============================================================================*/
+
 LIBNAME mydblib "&root_path";
 
-%macro open_csv_as_dataset(ticker, start_date, end_date, root_path);
-    /* Define the path for the CSV file */
-    %let csv_path = &root_path/&ticker..&start_date..&end_date..csv;
 
-    /* Check if the file exists */
-    %if %sysfunc(fileexist(&csv_path)) %then %do;
-        /* Import the CSV file as a SAS dataset */
-        proc import datafile="&csv_path"
-            out=work.&ticker._data
-            dbms=csv
-            replace;
-            getnames=yes; /* Use the first row as column names */
-            datarow=4; /* Skip the first two rows */
-        run;
+/*============================================================================*/
+/* STEP 5: Macro to import CSV file as SAS dataset                            */
+/*============================================================================*/
 
-        /* Rename the first column to Date */
-        data work.&ticker._data;
-            set work.&ticker._data;
-            rename Price = Date; /* Rename the first column (Price) to Date */
-        run;
+%MACRO open_csv_as_dataset(ticker, start_date, end_date, root_path);
 
-        /* Print the first few rows of the dataset to check */
-        proc print data=work.&ticker._data(obs=10);
-        run;
-    %end;
-    %else %do;
-        %put ERROR: The file &csv_path does not exist.;
-    %end;
-%mend;
+    /* Dynamically create CSV file path */
+    %LET csv_path = 
+        &root_path/&ticker..&start_date..&end_date..csv;
 
-%macro generate_volume_chart(dataset);
-	/* Check if the dataset parameter is provided */
-    %if &dataset=%then
-		%do;
-			%put ERROR: Dataset parameter is missing.;
-			%return;
-		%end;
+    /* Check whether the file exists */
+    %IF %SYSFUNC(FILEEXIST(&csv_path)) %THEN %DO;
 
-	/* Set a dynamic title for the chart */
-	title "Average Volume for Stock: &dataset";
+        /* Import CSV file into WORK library */
+        PROC IMPORT DATAFILE="&csv_path"
+            OUT=work.&ticker._data
+            DBMS=csv
+            REPLACE;
 
-	PROC CHART DATA=&dataset;
-		/* Create a horizontal bar chart to show the Average Volume for the stock dataset */
-		HBAR DATE / SUMVAR=Volume TYPE=MEAN;
-	RUN;
+            GETNAMES=YES;   /* Use first row as column names */
+            DATAROW=4;      /* Start reading data from row 4 */
 
-	/* Clear the title after the procedure */
-	title;
-%mend generate_volume_chart;
+        RUN;
 
-%macro moving_average(dataset, window);
-	DATA &dataset._moving_avg;
-		SET &dataset;
-		MA_Close=MEAN(LAG1(Close), LAG2(Close), LAG3(Close), LAG4(Close), 
-			LAG5(Close));
-		FORMAT MA_Close 8.2;
-	RUN;
+        /* Rename imported column */
+        DATA work.&ticker._data;
+            SET work.&ticker._data;
 
-	PROC PRINT DATA=&dataset._moving_avg;
-		TITLE "Stock Prices with &window-Day Moving Average for &dataset";
-		VAR Date Close MA_Close;
-	RUN;
+            /* Rename Price column to Date */
+            RENAME Price = Date;
 
-%mend moving_average;
+        RUN;
 
-%macro calculate_volatility(dataset, window);
-	PROC EXPAND DATA=&dataset OUT=&dataset._volatility METHOD=none;
-		CONVERT Close=Volatility / TRANSFORMOUT=(MOVSTD &window);
-	RUN;
+        /* Print sample observations for validation */
+        PROC PRINT DATA=work.&ticker._data(OBS=10);
+        RUN;
 
-	PROC PRINT DATA=&dataset._volatility;
-		TITLE "Volatility of Stock Price for &dataset (Window: &window Days)";
-		VAR Date Close Volatility;
-	RUN;
+    %END;
 
-%mend calculate_volatility;
+    %ELSE %DO;
+        %PUT ERROR: The file &csv_path does not exist.;
+    %END;
 
-%macro plot_stock_trend(dataset);
-	PROC SGPLOT DATA=&dataset;
-		TITLE "Stock Price Trend for &dataset";
-		SERIES X=Date Y=Open / LINEATTRS=(COLOR=blue) LEGENDLABEL="Open";
-		SERIES X=Date Y=High / LINEATTRS=(COLOR=green) LEGENDLABEL="High";
-		SERIES X=Date Y=Low / LINEATTRS=(COLOR=red) LEGENDLABEL="Low";
-		SERIES X=Date Y=Close / LINEATTRS=(COLOR=black) LEGENDLABEL="Close";
-		XAXIS LABEL="Date";
-		YAXIS LABEL="Price";
-	RUN;
+%MEND open_csv_as_dataset;
 
-%mend plot_stock_trend;
 
-%macro correlation_analysis(dataset);
-	PROC CORR DATA=&dataset;
-		TITLE "Correlation Between Volume and Close Price for &dataset";
-		VAR Volume Close;
-	RUN;
+/*============================================================================*/
+/* STEP 6: Macro to generate average trading volume chart                     */
+/*============================================================================*/
 
-%mend correlation_analysis;
+%MACRO generate_volume_chart(dataset);
 
-%macro plot_volume_trend(dataset);
-	PROC SGPLOT DATA=&dataset;
-		TITLE "Volume Trend for &dataset";
-		SERIES X=Date Y=Volume / LINEATTRS=(COLOR=blue) LEGENDLABEL="Volume";
-		XAXIS LABEL="Date";
-		YAXIS LABEL="Volume";
-	RUN;
+    /* Validate dataset parameter */
+    %IF &dataset = %THEN %DO;
+        %PUT ERROR: Dataset parameter is missing.;
+        %RETURN;
+    %END;
 
-%mend plot_volume_trend;
+    TITLE "Average Volume for Stock: &dataset";
 
-%macro candlestick_chart(dataset);
-	PROC SGPLOT DATA=&dataset;
-		TITLE "Candlestick Chart for &dataset";
+    PROC CHART DATA=&dataset;
 
-		/* Plot high and low prices using the HIGHLOW statement */
-		HIGHLOW X=Date HIGH=High LOW=Low / TYPE=BAR;
+        /* Horizontal bar chart of average trading volume */
+        HBAR DATE / 
+            SUMVAR=Volume
+            TYPE=MEAN;
 
-		/* Plot open and close prices as scatter plots to simulate candlestick */
-		SCATTER X=Date Y=Open / MARKERATTRS=(SYMBOL=CircleFilled COLOR=green) 
-			LEGENDLABEL="Open";
-		SCATTER X=Date Y=Close / MARKERATTRS=(SYMBOL=CircleFilled COLOR=red) 
-			LEGENDLABEL="Close";
-		XAXIS LABEL="Date";
-		YAXIS LABEL="Price";
-		KEYLEGEND / POSITION=RIGHT;
-	RUN;
+    RUN;
 
-%mend candlestick_chart;
+    TITLE;
+
+%MEND generate_volume_chart;
+
+
+/*============================================================================*/
+/* STEP 7: Macro to calculate moving average                                  */
+/*============================================================================*/
+
+%MACRO moving_average(dataset, window);
+
+    DATA &dataset._moving_avg;
+        SET &dataset;
+
+        /* Calculate 5-day moving average */
+        MA_Close = MEAN(
+            LAG1(Close),
+            LAG2(Close),
+            LAG3(Close),
+            LAG4(Close),
+            LAG5(Close)
+        );
+
+        FORMAT MA_Close 8.2;
+
+    RUN;
+
+    /* Display results */
+    PROC PRINT DATA=&dataset._moving_avg;
+
+        TITLE 
+        "Stock Prices with &window-Day Moving Average for &dataset";
+
+        VAR Date Close MA_Close;
+
+    RUN;
+
+%MEND moving_average;
+
+
+/*============================================================================*/
+/* STEP 8: Macro to calculate rolling volatility                              */
+/*============================================================================*/
+
+%MACRO calculate_volatility(dataset, window);
+
+    PROC EXPAND DATA=&dataset
+        OUT=&dataset._volatility
+        METHOD=none;
+
+        /* Calculate moving standard deviation */
+        CONVERT Close = Volatility /
+            TRANSFORMOUT=(MOVSTD &window);
+
+    RUN;
+
+    PROC PRINT DATA=&dataset._volatility;
+
+        TITLE 
+        "Volatility of Stock Price for &dataset 
+        (Window: &window Days)";
+
+        VAR Date Close Volatility;
+
+    RUN;
+
+%MEND calculate_volatility;
+
+
+/*============================================================================*/
+/* STEP 9: Macro to visualize stock price trends                              */
+/*============================================================================*/
+
+%MACRO plot_stock_trend(dataset);
+
+    PROC SGPLOT DATA=&dataset;
+
+        TITLE "Stock Price Trend for &dataset";
+
+        /* Plot OHLC price series */
+        SERIES X=Date Y=Open  / 
+            LINEATTRS=(COLOR=blue)
+            LEGENDLABEL="Open";
+
+        SERIES X=Date Y=High  / 
+            LINEATTRS=(COLOR=green)
+            LEGENDLABEL="High";
+
+        SERIES X=Date Y=Low   / 
+            LINEATTRS=(COLOR=red)
+            LEGENDLABEL="Low";
+
+        SERIES X=Date Y=Close / 
+            LINEATTRS=(COLOR=black)
+            LEGENDLABEL="Close";
+
+        XAXIS LABEL="Date";
+        YAXIS LABEL="Price";
+
+    RUN;
+
+%MEND plot_stock_trend;
+
+
+/*============================================================================*/
+/* STEP 10: Macro to perform correlation analysis                             */
+/*============================================================================*/
+
+%MACRO correlation_analysis(dataset);
+
+    PROC CORR DATA=&dataset;
+
+        TITLE 
+        "Correlation Between Volume and Close Price for &dataset";
+
+        VAR Volume Close;
+
+    RUN;
+
+%MEND correlation_analysis;
+
+
+/*============================================================================*/
+/* STEP 11: Macro to visualize trading volume trend                           */
+/*============================================================================*/
+
+%MACRO plot_volume_trend(dataset);
+
+    PROC SGPLOT DATA=&dataset;
+
+        TITLE "Volume Trend for &dataset";
+
+        SERIES X=Date Y=Volume /
+            LINEATTRS=(COLOR=blue)
+            LEGENDLABEL="Volume";
+
+        XAXIS LABEL="Date";
+        YAXIS LABEL="Volume";
+
+    RUN;
+
+%MEND plot_volume_trend;
+
+
+/*============================================================================*/
+/* STEP 12: Macro to simulate candlestick chart                               */
+/*============================================================================*/
+
+%MACRO candlestick_chart(dataset);
+
+    PROC SGPLOT DATA=&dataset;
+
+        TITLE "Candlestick Chart for &dataset";
+
+        /* High-Low bars */
+        HIGHLOW X=Date
+            HIGH=High
+            LOW=Low /
+            TYPE=BAR;
+
+        /* Open prices */
+        SCATTER X=Date Y=Open /
+            MARKERATTRS=(
+                SYMBOL=CircleFilled
+                COLOR=green
+            )
+            LEGENDLABEL="Open";
+
+        /* Close prices */
+        SCATTER X=Date Y=Close /
+            MARKERATTRS=(
+                SYMBOL=CircleFilled
+                COLOR=red
+            )
+            LEGENDLABEL="Close";
+
+        XAXIS LABEL="Date";
+        YAXIS LABEL="Price";
+
+        KEYLEGEND / POSITION=RIGHT;
+
+    RUN;
+
+%MEND candlestick_chart;
+
+
+/*============================================================================*/
+/* STEP 13: Download stock data using Python and yfinance                     */
+/*============================================================================*/
 
 PROC PYTHON;
-submit;
+SUBMIT;
+
 import yfinance as yf
 import os
 
-# Fetch the parameters from SAS macro variables
+# Retrieve SAS macro variables
 ticker = SAS.symget("ticker")
 start_date = SAS.symget("start_date")
 end_date = SAS.symget("end_date")
 root_path = SAS.symget("root_path")
 
-# Download the data for the specified ticker and date range
-data = yf.download(ticker, start=start_date, end=end_date)
+# Download historical stock data
+data = yf.download(
+    ticker,
+    start=start_date,
+    end=end_date
+)
 
-# Define the export path dynamically based on the root path, ticker, and date range
-export_path = os.path.join(root_path, f"{ticker}.{start_date}.{end_date}.csv")
+# Create export file path
+export_path = os.path.join(
+    root_path,
+    f"{ticker}.{start_date}.{end_date}.csv"
+)
 
-# Create the directory if it does not exist
-os.makedirs(os.path.dirname(export_path), exist_ok=True)
+# Create directory if necessary
+os.makedirs(
+    os.path.dirname(export_path),
+    exist_ok=True
+)
 
-# Save the data to CSV
+# Export data to CSV
 data.to_csv(export_path)
 
-# Print the first few rows to confirm data retrieval
+# Print preview of downloaded data
 print(data.head())
-endsubmit;
+
+ENDSUBMIT;
 RUN;
 
-%open_csv_as_dataset(&ticker, &start_date, &end_date, &root_path);
+
+/*============================================================================*/
+/* STEP 14: Import downloaded CSV into SAS                                    */
+/*============================================================================*/
+
+%open_csv_as_dataset(
+    &ticker,
+    &start_date,
+    &end_date,
+    &root_path
+);
+
+
+/*============================================================================*/
+/* STEP 15: Save imported dataset to permanent library                        */
+/*============================================================================*/
 
 PROC SQL;
-	CREATE TABLE mydblib.&ticker AS
-	SELECT *
-	FROM work.&ticker._data;
+
+    CREATE TABLE mydblib.&ticker AS
+    SELECT *
+    FROM work.&ticker._data;
+
 QUIT;
 
-LIBNAME STOCKS BASE
-"&root_path";
 
+/*============================================================================*/
+/* STEP 16: Define STOCKS library                                              */
+/*============================================================================*/
+
+LIBNAME STOCKS BASE "&root_path";
+
+
+/*============================================================================*/
+/* STEP 17: Execute analytical macros                                          */
+/*============================================================================*/
+
+/* Generate average trading volume chart */
 %generate_volume_chart(work.&ticker._data);
 
+/* Calculate moving average */
 %moving_average(work.&ticker._data, 5);
 
+/* Calculate rolling volatility */
 %calculate_volatility(work.&ticker._data, 5);
 
+/* Plot OHLC stock trend */
 %plot_stock_trend(work.&ticker._data);
 
+/* Analyze correlation between volume and closing price */
 %correlation_analysis(work.&ticker._data);
 
+/* Plot volume trend */
 %plot_volume_trend(work.&ticker._data);
 
+/* Generate candlestick chart */
 %candlestick_chart(work.&ticker._data);
