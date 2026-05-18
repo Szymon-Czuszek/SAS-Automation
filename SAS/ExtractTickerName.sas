@@ -1,7 +1,7 @@
 DATA &_output1;
 	SET &_input1;
 
-	/* Remove special characters using COMPRESS */
+	/* Remove special characters using COMPRESS function */
 	NAME=COMPRESS(NAME, "(),' ");
 
 	/* Remove the word 'close' (case insensitive) */
