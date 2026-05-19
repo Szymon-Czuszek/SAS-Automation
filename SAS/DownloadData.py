@@ -20,7 +20,7 @@ data = yf.download(
     start=start_date,
     end=end_date,
     group_by="ticker",   # keeps data organized per ticker
-    auto_adjust=True     # adjusts for splits/dividends (recommended)
+    auto_adjust=True     # adjusts for instruments like splits or dividends (recommended)
 )
 
 # --- STEP 4: Reshape data (optional but often useful) ---
