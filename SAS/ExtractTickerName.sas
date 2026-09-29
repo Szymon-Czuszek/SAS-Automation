@@ -11,6 +11,10 @@ DATA &_output1;
         actual dataset names are supplied dynamically when the code runs.
     */
     SET &_input1;
+
+        /*------------------------------------------------------------------------*/
+    /* STEP 2: Remove unwanted special characters from NAME                  */
+    /*------------------------------------------------------------------------*/
     NAME = COMPRESS(NAME, "(),' ");
 
     /* --- STEP 2: Remove the word 'close' (case-insensitive) --- */
