@@ -12,13 +12,8 @@ DATA &_output1;
     */
     SET &_input1;
 
-        /*------------------------------------------------------------------------*/
-    /* STEP 2: Remove unwanted special characters from NAME                  */
-    /*------------------------------------------------------------------------*/
-    NAME = COMPRESS(NAME, "(),' ");
 
-    /* --- STEP 2: Remove the word 'close' (case-insensitive) --- */
-        /*------------------------------------------------------------------------*/
+    /*------------------------------------------------------------------------*/
     /* STEP 2: Remove unwanted special characters from NAME                  */
     /*------------------------------------------------------------------------*/
 
@@ -40,10 +35,32 @@ DATA &_output1;
             "JohnCloseSmith"
     */
     NAME = COMPRESS(NAME, "(),' ");
-    /* TRANWRD is case-sensitive, so we handle all common variations */
 
+
+    /*------------------------------------------------------------------------*/
+    /* STEP 3: Remove the word "close"                                        */
+    /*------------------------------------------------------------------------*/
+
+    /*
+        TRANWRD() replaces an exact character string with another string.
+
+        Syntax:
+            TRANWRD(source, from, to)
+
+        SAS's TRANWRD() function is case-sensitive.
+
+        Therefore, these three statements handle the most common
+        capitalization variations of the word "close".
+    */
+
+    /* Remove lowercase "close" */
     NAME = TRANWRD(NAME, 'close', '');
+
+    /* Remove uppercase "CLOSE" */
     NAME = TRANWRD(NAME, 'CLOSE', '');
+
+    /* Remove title-case "Close" */
     NAME = TRANWRD(NAME, 'Close', '');
+
 
 RUN;
