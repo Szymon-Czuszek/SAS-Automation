@@ -1,10 +1,8 @@
 # 🚀 SAS-Automation
 
-######
-
 ## 🔍 Overview
 
-This project focuses on automating analytical processes using SAS, leveraging stock data sourced from Yahoo Finance. The automation encompasses data retrieval, processing, and visualization, making it a valuable resource for financial analysis and forecasting.
+This project focuses on automating analytical processes using SAS and stock market data sourced from Yahoo Finance. The automation covers data retrieval, processing, analysis, and visualization, providing a comprehensive solution for financial analysis and forecasting.
 Yahoo Finance is a widely recognized platform that provides access to real-time and historical financial data, including:
 - 📈 Stock quotes and indexes
 - 💱 Currencies and commodities
